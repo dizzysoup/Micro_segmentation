@@ -1,20 +1,29 @@
 [
     {
         "ip": "192.168.173.101",
-        "function": "Null",
+        "function": "Web",
         "priority": "Null",
-        "type": "Order",
-        "application": "Null",
-        "environment": "Null",
-        "security": "quarantined"
-    },
-    {
-        "ip": "192.168.173.102",
-        "function": "Null",
-        "priority": "Null",
-        "type": "Order",
+        "type": "Null",
         "application": "Null",
         "environment": "Null",
         "security": "normal"
+    },
+    {
+        "ip": "192.168.173.102",
+        "function": "Database",
+        "priority": "Null",
+        "type": "Null",
+        "application": "Null",
+        "environment": "Null",
+        "security": "normal"
+    },
+    {
+        "ip": "192.168.173.103",
+        "function": "Honeypot",
+        "priority": "Null",
+        "type": "Null",
+        "application": "Null",
+        "environment": "Null",
+        "security": "vulnerable"
     }
 ]

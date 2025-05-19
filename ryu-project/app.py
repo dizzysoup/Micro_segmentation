@@ -164,7 +164,8 @@ class SimpleSwitchRest13(app_manager.RyuApp):
             dsl_rules = file.readlines()
 
         for rule in dsl_rules:
-            rule = rule.strip().split(" ")         
+            rule = rule.strip().split(" ")   
+            print(f"寫入流表規則：{rule}")      
             self.setup_flow_for_acl(datapath, rule)
     # 刪除特定IP的所有flows
     def delete_flows_by_ip(self, datapath, ip):
@@ -217,9 +218,10 @@ class SimpleSwitchRest13(app_manager.RyuApp):
             out_port = self.host_ports[dsc_mac]  # 再針對 mac 取出 port            
             # actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER, ofproto.OFPCML_NO_BUFFER),parser.OFPActionOutput(ofproto.OFPP_FLOOD)]  # 允許流量進行
             actions = [parser.OFPActionOutput(out_port)]
+            self.add_flow(datapath, 100, match, actions)
         elif action == "deny":
             actions = []  # 沒有動作，相當於丟棄該流量        
-        self.add_flow(datapath, 999, match, actions)
+            self.add_flow(datapath, 999, match, actions)
 
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def _packet_in_handler(self, ev):

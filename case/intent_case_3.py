@@ -56,7 +56,7 @@ if response.status_code == 200:
 else :
     print(f" {YELLOW}初始化{RESET} h2 初始化 (type:Order,security:normal) ❌")
 
-
+# ---------------------------------- intent 設置 ----------------------------------------
 url = "http://sdn.yuntech.poc.com/datacenter/intent"
 
 # Allow 的設置

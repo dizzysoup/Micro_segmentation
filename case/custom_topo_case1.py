@@ -54,7 +54,8 @@ if __name__ == '__main__':
 
     # 執行 websocket_server
     for host in [net.get('h1'), net.get('h2'), net.get('h3'),net.get('h4')]:
-        host.cmd(f'python3 /home/sdntest/ryu/gateway/websocket_server.py > /tmp/{host}_server.log 2>&1 &') # websocket server       
+        host.cmd(f'python3 /home/sdntest/ryu/gateway/websocket_server.py > /tmp/{host}_server.log 2>&1 &') # websocket server 
+        host.cmd(f'python3 /home/sdntest/ryu/gateway/connection_logger.py > /tmp/{host.name}_clog.log 2>&1 &') # push log to SDC      
         print(f"Started websocket_server on {host.name}")
 
     # h2 跟 h4 開啟3306連接

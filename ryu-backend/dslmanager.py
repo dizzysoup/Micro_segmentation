@@ -58,9 +58,7 @@ def update_policy_to_ryu():
                     "protocol": protocol,
                     "method": method
                 }
-                print("因為協定是TCP，加入反向策略：")
                 result.append(reverse_policy)
-                print(reverse_policy)
     url = "http://sdn.yuntech.poc.com/ryu/policy"
     print(json.dumps(result,indent=4))
     try:
@@ -107,7 +105,7 @@ async def update_policy_to_iptables():
     # 開啟websocket，要把策略更新到host上的iptables
     
     uri = f'ws://{ingress_ip}:8766'
-   
+    print(f"開啟websocket連線:{uri}")
     # 資料發送
     async with websockets.connect(uri) as websocket: 
         # 將字典編碼為JSON

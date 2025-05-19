@@ -1,4 +1,4 @@
-allow{TCP, 192.168.173.102, 192.168.173.101 },{ 3306, (security:normal),(type:Order) }
-allow{ICMP, 192.168.173.102, 192.168.173.101 },{ , (security:normal),(type:Order) }
+deny{ICMP, 192.168.173.103, 192.168.173.102 },{ , (security:vulnerable),(security:normal) }
+deny{ICMP, 192.168.173.103, 192.168.173.101 },{ , (security:vulnerable),(security:quarantined) }
 deny{ICMP, 192.168.173.102, 192.168.173.101 },{ , (security:normal),(security:quarantined) }
-deny{TCP, 192.168.173.102, 192.168.173.101 },{ , (security:normal),(security:quarantined) }
+allow{ICMP, 192.168.173.102, 192.168.173.101 },{ , (security:normal),(function:Web) }

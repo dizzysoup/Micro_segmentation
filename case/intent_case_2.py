@@ -140,9 +140,25 @@ data = {
 }
 response = requests.post(url, json=data)
 if response.status_code == 200:
-    print(f" {GREEN}Allow{RESET} security: normal ===ICMP===> function : database ✅")
+    print(f" {GREEN}Allow{RESET} security: vulnerable ===ICMP===> function : database ✅")
 else :
-    print(f" {GREEN}Allow{RESET} security: normal ===ICMP===> function : database ❌")
+    print(f" {GREEN}Allow{RESET} security: vulnerable ===ICMP===> function : database ❌")
+
+# ICMP vulnerable ICMP => Honeypot
+data = {
+    "method" : "allow",
+    "egresstype" : "security",
+    "egress" : "vulnerable",
+    "protocol": "ICMP",
+    "ingresstype" : "function",
+    "ingress" : "Honeypot"
+}
+response = requests.post(url, json=data)
+if response.status_code == 200:
+    print(f" {GREEN}Allow{RESET} security: vulnerable ===ICMP===> function : Honeypot ✅")
+else :
+    print(f" {GREEN}Allow{RESET} security: vulnerable ===ICMP===> function : Honeypot ❌")  
+    
 # TCP
 data = {
     "method" : "allow",

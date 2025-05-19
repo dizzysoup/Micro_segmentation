@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,request
+from flask import Flask,jsonify,request, session
 from dslmanager import transform_intent_to_dsl,reevaluate_dsl,load_rpg
 from host_even_receiver import launch_ws_server
 import threading
@@ -8,14 +8,26 @@ import json
 import re
 import asyncio
 import os 
-app = Flask(__name__)
+import jwt
+import datetime
+import redis 
 
+app = Flask(__name__)
+r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r.flushdb()
 load_dotenv()
 
 # 模擬讀取 intent.txt 和 epg.json 的路徑
 INTENT_FILE = 'intent.txt'
 RPG_FILE = os.getenv('RPG_FILE', 'rpg_case_1.json')
+JWT_SECRET = os.getenv('JWT_SECRET')
+JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
+JWT_EXP_DELTA_SECONDS = int(os.getenv('JWT_EXP_DELTA_SECONDS', 120))  
+JWT_ISSUER = os.getenv('JWT_ISSUER', 'SDC_Server')
+FLASK_SECRET_KEY = os.getenv('FLASK_SECRET_KEY')
 
+app.secret_key = FLASK_SECRET_KEY
+app.permanent_session_lifetime = datetime.timedelta(minutes=30)
 
 # 讀取 intent.txt
 def read_intent_file():
@@ -258,7 +270,85 @@ def get_all_dsl():
         "edges": edges
     }
     return jsonify(data)
+
+
+# 登入、請求憑證
+@app.route('/datacenter/request_cert', methods=['POST'])
+def request_cert():
+    data = request.get_json()
+    ip = request.headers.get("X-Forwarded-For").split(",")[0].strip()
+    print(f"Request from IP: {ip}")
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    # 提取 USER 資料
+    user = data.get("user", {})
+    # 檢查 user 資訊
     
+    # 產生 ID token(JWT)    
+    now = datetime.datetime.utcnow()
+    payload = {
+        'iss': JWT_ISSUER,
+        'exp': now + datetime.timedelta(seconds=JWT_EXP_DELTA_SECONDS),
+        'iat': now,
+        'sub': user,
+    }
+    id_token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    print(f"JWT ID Token: {id_token}")
+    
+    # 儲存到Redis ： 使用hash結構
+    r.hset(f"user_session:{user}", mapping={
+        "ip" : ip,
+        "id_token": id_token,
+        "login_time": now.isoformat()
+    })
+
+    return jsonify({
+        "status": "success",
+        "id_token": id_token,
+        "message": f"Certificate requested for user {id_token}."
+    })
+
+# 查看目前存放在Redis內的所有資訊
+@app.route('/datacenter/session/status', methods=['GET'])
+def session_status():
+    # 尋找所有 user_session:* 的 key
+    keys = r.keys("user_session:*")
+    
+    sessions = []
+
+    for key in keys:
+        user_id = key.split(":")[1]  # 取出 user_id
+        data = r.hgetall(key)
+        sessions.append({
+            "user_id": user_id,
+            "ip" : data.get("ip"),
+            "id_token": data.get("id_token"),
+            "login_time": data.get("login_time")
+        })
+
+    return jsonify({
+        "total_sessions": len(sessions),
+        "active_sessions": sessions
+    }), 200
+
+# 登出   
+@app.route('/datacenter/logout', methods=['POST'])
+def logout_user():
+    data = request.get_json()
+    user_id = data.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Missing user_id"}), 400
+
+    redis_key = f"user_session:{user_id}"
+    if r.exists(redis_key):
+        r.delete(redis_key)
+        return jsonify({"status": "logged out", "user_id": user_id}), 200
+    else:
+        return jsonify({"error": "Session not found"}), 404
+
+ 
 # ✅ 在 Flask 主程式之前就啟動 WebSocket Server（背景執行）
 ws_thread = threading.Thread(target=launch_ws_server, daemon=True)
 ws_thread.start()
