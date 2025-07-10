@@ -1,3 +1,7 @@
+# ==================================================
+#  Agent 會向PDP 請求憑證
+# ==================================================
+
 import http.client
 import json
 import argparse
@@ -40,6 +44,7 @@ def request_cert(user_id: str):
         return None
     finally:
         conn.close()
+
 
 
 if __name__ == "__main__":

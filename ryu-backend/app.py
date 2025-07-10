@@ -273,8 +273,9 @@ def get_all_dsl():
 
 
 # 登入、請求憑證
+# 將該ip 的label 變為User
 @app.route('/datacenter/request_cert', methods=['POST'])
-def request_cert():
+async def request_cert():
     data = request.get_json()
     ip = request.headers.get("X-Forwarded-For").split(",")[0].strip()
     print(f"Request from IP: {ip}")
@@ -302,7 +303,25 @@ def request_cert():
         "id_token": id_token,
         "login_time": now.isoformat()
     })
-
+    
+    # 修改 RPG_FILE 中對應 IP 的 priority 為 "IT"
+    with open(RPG_FILE, 'r') as file:
+        rpg_data = json.load(file)
+        for entry in rpg_data:
+            if entry.get("ip") == ip:               
+                old_val = entry.get("priority", "Null")
+                entry["priority"] = "IT"
+                updated = True
+                break
+    # 寫入回 RPG_FILE
+    
+    if updated:
+        with open(RPG_FILE, 'w') as file:
+            json.dump(rpg_data, file, indent=4)
+        # 標籤值做改變了，故呼叫reevaluate_dsl 函式，進行重新評估
+        # reevaluate_dsl 會先把原本的所有 ip 值
+        diff_labels = {0: {"before": old_val, "after": "IT"}}
+        await reevaluate_dsl(ip,diff_labels)            
     return jsonify({
         "status": "success",
         "id_token": id_token,
@@ -337,9 +356,21 @@ def session_status():
 def logout_user():
     data = request.get_json()
     user_id = data.get("user_id")
-
+    ip = data.get("ip")
     if not user_id:
         return jsonify({"error": "Missing user_id"}), 400
+    
+    with open(RPG_FILE, 'r') as file:
+        rpg_data = json.load(file)
+        for entry in rpg_data:
+            if entry.get("ip") == ip:
+                print(ip)
+                entry["priority"] = "Null"
+                updated = True
+                break
+    if updated:
+        with open(RPG_FILE, 'w') as file:
+            json.dump(rpg_data, file, indent=4) 
 
     redis_key = f"user_session:{user_id}"
     if r.exists(redis_key):

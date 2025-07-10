@@ -1,4 +1,4 @@
-deny{ICMP, 192.168.173.103, 192.168.173.102 },{ , (security:vulnerable),(security:normal) }
-deny{ICMP, 192.168.173.103, 192.168.173.101 },{ , (security:vulnerable),(security:quarantined) }
-deny{ICMP, 192.168.173.102, 192.168.173.101 },{ , (security:normal),(security:quarantined) }
-allow{ICMP, 192.168.173.102, 192.168.173.101 },{ , (security:normal),(function:Web) }
+allow{ICMP, 192.168.173.101, 192.168.173.102 },{ , (priority:IT),(function:Web) }
+allow{TCP, 192.168.173.101, 192.168.173.102 },{ 80, (priority:IT),(function:Web) }
+allow{ICMP, 192.168.173.101, 192.168.173.103 },{ , (priority:IT),(function:Backend) }
+allow{TCP, 192.168.173.101, 192.168.173.103 },{ 22, (priority:IT),(function:Backend) }

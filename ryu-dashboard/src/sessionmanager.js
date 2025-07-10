@@ -41,11 +41,11 @@ function SessionManager() {
         fetchSessions();
     }, []);
 
-    const handleLogout = async (userId) => {
+    const handleLogout = async (userId , Ip) => {
         const res = await fetch("/datacenter/logout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user_id: userId }),
+            body: JSON.stringify({ user_id: userId , ip:Ip }),
         });
 
         if (res.ok) {
@@ -98,7 +98,7 @@ function SessionManager() {
                                     <Button
                                         colorScheme="red"
                                         size="sm"
-                                        onClick={() => handleLogout(s.user_id)}
+                                        onClick={() => handleLogout(s.user_id, s.ip)}
                                     >
                                         Logout
                                     </Button>
