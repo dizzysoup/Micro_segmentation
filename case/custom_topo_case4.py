@@ -12,6 +12,7 @@ load_dotenv()
 
 HOST1_IP = os.getenv('HOST1_IP', '')
 HOST2_IP = os.getenv("HOST2_IP", "")
+HOST3_IP = os.getenv("HOST3_IP", "192.168.173.103")
 
 class CustomTopo(Topo):
     def build(self):
@@ -20,10 +21,12 @@ class CustomTopo(Topo):
         
         h1 = self.addHost('h1', ip=HOST1_IP + '/24', mac='00:00:00:00:00:01')
         h2 = self.addHost('h2', ip=HOST2_IP + '/24', mac='00:00:00:00:00:02')
-       
+        h3 = self.addHost('h3', ip=HOST3_IP + '/24', mac='00:00:00:00:00:03')
+        
         # 不指定 port，Mininet 自行建立，後面我們會手動替換
         self.addLink(h1, s1)
         self.addLink(h2, s1)
+        self.addLink(h3, s1)
        
 
 def fix_ofport(switch_name, iface_name, port_number):
@@ -46,15 +49,15 @@ if __name__ == '__main__':
     # 固定指定 port
     fix_ofport('s1', 's1-eth1', 2)  # h1
     fix_ofport('s1', 's1-eth2', 3)  # h2
-    
+    fix_ofport('s1', 's1-eth3', 4) # h3
 
     print("\n✅ 已固定 Port 編號如下：")
     print("00:00:00:00:00:01 → port 2")
     print("00:00:00:00:00:02 → port 3")
-
+    print("00:00:00:00:00:03 → port 4")
 
     # 執行 websocket_server
-    for host in [net.get('h1'), net.get('h2')]:
+    for host in [net.get('h1'), net.get('h2') , net.get('h3')]:
         host.cmd(f'python3 /home/sdntest/ryu/gateway/websocket_server.py > /tmp/{host}_server.log 2>&1 &') # websocket server
         host.cmd(f'python3 /home/sdntest/ryu/gateway/connection_logger.py > /tmp/{host.name}_clog.log 2>&1 &') # push log to SDC
         print(f"Started websocket_server on {host.name}")
@@ -62,10 +65,12 @@ if __name__ == '__main__':
     # ✅ 開啟 XTerm 終端視窗
     makeTerm(net.get('h1'), cmd="bash")
     makeTerm(net.get('h2'), cmd="bash")
+    makeTerm(net.get('h3'), cmd="bash")
     
-    print("\n🔁 執行 h1 、h2 的 ping 測試...")
+    print("\n🔁 執行 h1 、h2、h3 的 ping 測試...")
     net.get('h1').cmdPrint('ping -c 2 192.168.173.19')
     net.get('h2').cmdPrint('ping -c 2 192.168.173.19')
+    net.get('h3').cmdPrint('ping -c 2 192.168.173.19')
     
     CLI(net)
     net.stop()

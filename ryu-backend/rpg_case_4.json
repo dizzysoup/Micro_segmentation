@@ -1,8 +1,8 @@
 [
     {
         "ip": "192.168.173.101",
-        "function": "Web",
-        "priority": "Null",
+        "function": "Null",
+        "priority": "IT",
         "type": "Order",
         "application": "Null",
         "environment": "Null",
@@ -10,20 +10,20 @@
     },
     {
         "ip": "192.168.173.102",
-        "function": "Database",
+        "function": "Web",
         "priority": "Null",
         "type": "Order",
         "application": "Null",
         "environment": "Null",
-        "security": "normal"
+        "security": "Null"
     },
     {
         "ip": "192.168.173.103",
-        "function": "Honeypot",
+        "function": "Backend",
         "priority": "Null",
         "type": "Null",
         "application": "Null",
         "environment": "Null",
-        "security": "vulnerable"
+        "security": "Null"
     }
 ]
