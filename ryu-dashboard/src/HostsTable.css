@@ -53,3 +53,59 @@
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);    
 }
+
+/* RWD: 讓表格在小螢幕可橫向滾動 */
+@media (max-width: 768px) {
+  .containerStyle {
+    padding: 10px;
+  }
+  .tableStyle {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tableStyle table,
+  .tableStyle thead,
+  .tableStyle tbody,
+  .tableStyle th,
+  .tableStyle td,
+  .tableStyle tr {
+    display: block;
+  }
+  .tableHeaderStyle,
+  .tableCellStyle {
+    padding: 8px;
+    text-align: right;
+    position: relative;
+    min-width: 120px;
+    border-bottom: 1px solid #ddd;
+  }
+  .tableHeaderStyle {
+    background: #7a4caf;
+    color: #fff;
+    font-weight: bold;
+  }
+  .tableCellStyle:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    font-weight: bold;
+    color: #7a4caf;
+    text-align: left;
+    white-space: nowrap;
+  }
+}
+
+/* RWD: 更小螢幕調整 */
+@media (max-width: 480px) {
+  .containerStyle {
+    padding: 2px;
+  }
+  .tableHeaderStyle,
+  .tableCellStyle {
+    padding: 6px;
+    min-width: 90px;
+  }
+}

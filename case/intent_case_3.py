@@ -105,7 +105,23 @@ if response.status_code == 200:
     print(f" {RED}Deny{RESET} security: normal ===ICMP===> security : quarantined ✅")
 else :
     print(f" {RED}Deny{RESET} security: normal ===ICMP===> security : quarantined ❌")
-    
+
+# Deny TCP 3306 
+data = {
+    "method" : "deny",
+    "egresstype" : "security",
+    "egress" : "normal",
+    "protocol": "TCP",
+    "port" : "3306",
+    "ingresstype" : "type",
+    "ingress" : "quarantined"
+}
+response = requests.post(url, json=data)
+if response.status_code == 200:
+    print(f" {RED}Deny{RESET} security: normal ===TCP 3306===> security : quarantined ✅")
+else :
+    print(f" {RED}Deny{RESET} security: normal ===TCP 3306===> security : quarantined ❌")
+
 data = {
     "method" : "deny",
     "egresstype" : "security",

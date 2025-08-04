@@ -107,7 +107,7 @@ class SimpleSwitchRest13(app_manager.RyuApp):
 
         
         # 4️⃣ 所有 host 列表（後面迴圈要用）
-        hosts = [HOST1_IP, HOST2_IP, HOST3_IP] 
+        hosts = [HOST1_IP, HOST2_IP, HOST3_IP, HOST4_IP] 
         admin_hosts = [VM_IP,USER_IP]
         
         for host_ip in hosts:

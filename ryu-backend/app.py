@@ -303,7 +303,7 @@ async def request_cert():
         "id_token": id_token,
         "login_time": now.isoformat()
     })
-    
+    updated = False
     # 修改 RPG_FILE 中對應 IP 的 priority 為 "IT"
     with open(RPG_FILE, 'r') as file:
         rpg_data = json.load(file)

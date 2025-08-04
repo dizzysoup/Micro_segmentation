@@ -1,18 +1,18 @@
 [
     {
         "ip": "192.168.173.101",
-        "function": "Web",
+        "function": "Null",
         "priority": "Null",
-        "type": "Null",
+        "type": "Order",
         "application": "Null",
         "environment": "Null",
-        "security": "normal"
+        "security": "quarantined"
     },
     {
         "ip": "192.168.173.102",
-        "function": "Database",
+        "function": "Null",
         "priority": "Null",
-        "type": "Null",
+        "type": "Order",
         "application": "Null",
         "environment": "Null",
         "security": "normal"

@@ -156,11 +156,12 @@ async def transform_intent_to_dsl(intent):
     if protocol == 'ICMP' :      
         update_policy_to_ryu() # policy 更新到RyuController
     if protocol == 'TCP' :
-        update_policy_to_ryu() # policy 更新到RyuController
         await update_policy_to_iptables() # policy 更新到iptables
+        update_policy_to_ryu() # policy 更新到RyuController
+        
 
 # 將intent 轉換成dsl (特定ip)
-def transform_intent_to_dsl_ip(intent,ip):  
+async def transform_intent_to_dsl_ip(intent,ip):  
    
     try:
         with open('dsl.txt', 'r') as existing_file:
@@ -169,14 +170,18 @@ def transform_intent_to_dsl_ip(intent,ip):
         existing_lines = set()
           
     # 開啟 dsl.txt 準備寫入    
-    with open('dsl.txt', 'a') as dsl_file:   
+    with open('dsl.txt', 'a') as dsl_file: 
+        # deny security:normal, TCP:3306, security:quarantined 
         parts = intent.strip().split(",")  
+        # deny security:normal  TCP:3306 type:quarantined  
+        
            
         # 構建 DSL 格式
-        # 假設格式為 allow{TCP, 192.168.173.102, 192.168.173.103 },{ 80, (function:Web),(function:Database) }
+        # security
         egresstype = parts[0].split(" ")[1].split(":")[0]
+        # normal
         egresslabel = parts[0].split(" ")[1].split(":")[1]           
-            
+        #  type:quarantined 
         ingresstype =  parts[2].split(" ")[1].split(":")[0]
         ingresslabel = parts[2].split(" ")[1].split(":")[1]
             
@@ -205,8 +210,9 @@ def transform_intent_to_dsl_ip(intent,ip):
     if protocol == 'ICMP' :      
         update_policy_to_ryu() # policy 更新到RyuController
     if protocol == 'TCP' :
+        await update_policy_to_iptables() # policy 更新到iptables
         update_policy_to_ryu() # policy 更新到RyuController
-        update_policy_to_iptables() # policy 更新到iptables
+        
 
 # 重新評估DSL 的規則
 # 當一個 IP 的 Label 改變，就重新產生這個 IP 的所有 DSL，避免規則過期而未撤銷
@@ -248,4 +254,4 @@ async def reevaluate_dsl(ip,deff_labels):
         intents = intent_file.readlines()
     print(f"重新寫入{ip}的DSL")
     for intent in intents:
-        transform_intent_to_dsl_ip(intent,ip) # intent 轉換成DSL (只轉換特定ip)
+        await transform_intent_to_dsl_ip(intent,ip) # intent 轉換成DSL (只轉換特定ip)

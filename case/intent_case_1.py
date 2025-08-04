@@ -5,8 +5,8 @@
 import requests
 import json
 
-url = "http://sdn.yuntech.poc.com/datacenter/intent"
 
+url = "http://sdn.yuntech.poc.com/datacenter/submit_labels"
 RED = '\033[91m'
 RESET = '\033[0m'
 GREEN = '\033[92m'
@@ -85,6 +85,7 @@ if response.status_code == 200:
 else :
     print(f" {YELLOW}初始化{RESET} h4 初始化 (function:Database,type:Shipping,environment:Production) ❌")
 
+url = "http://sdn.yuntech.poc.com/datacenter/intent"
 # Deny 策略
 # 1. Environment: Testing ===TCP 3306 ===> Environment : Production
 data = {

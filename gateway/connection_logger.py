@@ -10,6 +10,7 @@ SDC_WEBSOCKET_URI = "ws://sdn.yuntech.poc.com:8765"
 
 # ===== 將事件寫入 log.txt =====
 def log_event(event):
+    
     with open("log.txt", "a") as f:
         f.write(f"{datetime.datetime.now()} | {event}\n")
 

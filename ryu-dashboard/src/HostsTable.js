@@ -114,9 +114,9 @@ function HostsTable() {
 
   return (
     <Stack align="center">
-      <Heading> SDN 監控面板 </Heading>
+      <Heading> SDN Monitoring Dashboard </Heading>
       <Heading as="h3" size="lg" noOfLines={1}>
-        主機資訊
+        Host Information
       </Heading>
 
       {loading ? (
@@ -125,16 +125,16 @@ function HostsTable() {
         <table className="tableStyle">
           <thead>
             <tr className="headerRowStyle">
-              <th className="tableHeaderStyle">MAC 地址</th>
-              <th className="tableHeaderStyle">IPv4 地址</th>
-              <th className="tableHeaderStyle">IPv6 地址</th>
-              <th className="tableHeaderStyle">連接埠名稱</th>
+              <th className="tableHeaderStyle">MAC Address</th>
+              <th className="tableHeaderStyle">IPv4 Address</th>
+              <th className="tableHeaderStyle">IPv6 Address</th>
+              <th className="tableHeaderStyle">NIC</th>
               {labelCategories.map((cat) => (
                 <th key={cat} className="tableHeaderStyle">
                   {cat.charAt(0).toUpperCase() + cat.slice(1)}
                 </th>
               ))}
-              <th className="tableHeaderStyle">送出</th>
+              <th className="tableHeaderStyle">Send</th>
             </tr>
           </thead>
           <tbody>
@@ -145,40 +145,40 @@ function HostsTable() {
                   backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#fff",
                 }}
               >
-                <td className="tableCellStyle">{host.mac}</td>
-                <td className="tableCellStyle">
+                <td className="tableCellStyle" data-label="MAC Address">{host.mac}</td>
+                <td className="tableCellStyle" data-label="IPv4 Address">
                   {host.ipv4.length > 0 ? host.ipv4.join(", ") : "N/A"}
                 </td>
-                <td className="tableCellStyle">
+                <td className="tableCellStyle" data-label="IPv6 Address">
                   {host.ipv6.length > 0 ? host.ipv6.join(", ") : "N/A"}
                 </td>
-                <td className="tableCellStyle">{host.port.name}</td>
+                <td className="tableCellStyle" data-label="Port">{host.port.name}</td>
                 {labelCategories.map((category) => (
-                  <td key={category} className="tableCellStyle">
+                  <td key={category} className="tableCellStyle" data-label={category.charAt(0).toUpperCase() + category.slice(1)}>
                     <select
-                        value={
-                          selectedLabels[host.mac]?.[category] ??
-                          epgDefaults[host.mac]?.[category] ??
-                          ""
-                        }
-                        onChange={(e) => handleLabelChange(e, host.mac, category)}
-                        className="select-style" >
-                        <option value="">選擇標籤</option>
-                        {labels[category]?.map((label, idx) => (
-                          <option key={idx} value={label}>
-                            {label}
-                          </option>
-                        ))}
+                      value={
+                        selectedLabels[host.mac]?.[category] ??
+                        epgDefaults[host.mac]?.[category] ??
+                        ""
+                      }
+                      onChange={(e) => handleLabelChange(e, host.mac, category)}
+                      className="select-style"
+                    >
+                      <option value="">Select Label</option>
+                      {labels[category]?.map((label, idx) => (
+                        <option key={idx} value={label}>
+                          {label}
+                        </option>
+                      ))}
                     </select>
-
                   </td>
                 ))}
-                <td className="tableCellStyle">
+                <td className="tableCellStyle" data-label="Send">
                   <button
                     onClick={() => handleSubmit(host)}
                     className="submit-button"
                   >
-                    送出
+                    Send
                   </button>
                 </td>
               </tr>

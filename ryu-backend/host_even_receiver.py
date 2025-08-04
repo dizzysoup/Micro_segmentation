@@ -30,7 +30,7 @@ def load_dsl_rules(file_path="dsl.txt"):
                     "port": port
                 })
             except Exception as e:
-                print(f"[!] DSL 解析錯誤：{e}")
+                print(f"[!] DSL parsing error: {e}")
     return rules
 
 # 檢查event 是否allow
@@ -62,7 +62,7 @@ def is_port_in_use(port):
 
 # 🧼 嘗試釋放 port（僅限 Linux，利用 lsof + kill）
 def free_port(port):
-    print(f"[⚠️] Port {port} 已被佔用，嘗試釋放中...")
+    print(f"[⚠️] Port {port} is occupied, trying to free it...")
     try:
         # 取得佔用該 port 的 PID
         output = os.popen(f"lsof -i :{port} -sTCP:LISTEN -t").read()
@@ -70,11 +70,11 @@ def free_port(port):
             pids = output.strip().split("\n")
             for pid in pids:
                 os.kill(int(pid), signal.SIGTERM)
-                print(f"[✔] 已終止 PID {pid} 使用的 port {port}")
+                print(f"[✔] Terminated process PID {pid} using port {port}")
         else:
-            print(f"[❌] 找不到佔用 {port} 的進程")
+            print(f"[❌] No process found using port {port}")
     except Exception as e:
-        print(f"[❌] 釋放 port 失敗：{e}")
+        print(f"[❌] Failed to free port: {e}")
 
 async def handle_event(websocket):
     rules = load_dsl_rules()  # 每次連線前載入最新 dsl.txt   
@@ -82,13 +82,13 @@ async def handle_event(websocket):
     async for message in websocket:
         try:
             event = json.loads(message)
-            print(f"[✅] 收到來自主機的事件：{event}")
+            print(f"[✅] Received event from host: {event}")
 
             # TODO: 你可以在這裡加入 intent 白名單檢查邏輯
             allowed = is_event_allowed(event, rules)
             if allowed:
                 response = {"status": "received", "intent_check": "allowed"}
-                print(f"[✅] 收到來自主機的事件，符合 DSL 規則：{event}")
+                print(f"[✅] Received event from host, matches DSL rule: {event}")
             else:
                 limit -= 1
                 print(limit)
@@ -99,7 +99,7 @@ async def handle_event(websocket):
                     "reason": "Intent not defined in DSL"
                 }
                 if limit <= 0:
-                    print(f"[❌] 嘗試連線次數過多，進行阻擋：{event}")
+                    print(f"[❌] Too many connection attempts, blocking: {event}")
                     url = "http://sdn.yuntech.poc.com/datacenter/submit_labels"
                     
                     data = {
@@ -117,16 +117,16 @@ async def handle_event(websocket):
                     }
                     response = requests.post(url, json=data)
                 else : 
-                    print(f"[❌] 收到來自主機的事件，但不在 DSL 規則中，建議阻擋：{event}")
+                    print(f"[❌] Received event from host, not in DSL rules, block suggested: {event}")
                 log_event_to_file(event)  # ✅ 寫入 log.txt
             await websocket.send(json.dumps(response))
         except websockets.exceptions.ConnectionClosedOK as e:
-            print(f"[ℹ️] 主機連線已正常關閉：{e}")
+            print(f"[ℹ️] Host connection closed normally: {e}")
         except Exception as e:
-            print(f"[❌] WebSocket 錯誤：{e}")
+            print(f"[❌] WebSocket error: {e}")
 
 async def start_websocket_server():
-    print("[*] 啟動 WebSocket Server 監聽 0.0.0.0:8765")
+    print("[*] Starting WebSocket Server on 0.0.0.0:8765")
     async with websockets.serve(handle_event, "0.0.0.0", 8765):
         await asyncio.Future()
 
@@ -138,5 +138,4 @@ def launch_ws_server():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(start_websocket_server())
-    
-# =============================================================
+
